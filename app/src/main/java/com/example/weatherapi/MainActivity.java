@@ -18,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
     TextView t_lat, t_lon, t_city, t_weather;
     Button btn_getLoc;
 
-
     String url1 = "https://api.openweathermap.org/data/2.5/weather?appid=af9001dce8720bbe36288523ce329664";
 
     @Override
@@ -40,25 +39,49 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        btn_getLoc.setOnClickListener(new View.OnClickListener() { //Get current location
 
-        btn_getLoc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getLocation(view);
+                String a_lat = "0";
+                String a_lon = "0";
+                a_lat = getLocs(1);
+                a_lon = getLocs(2);
+                t_lat.setText(a_lat);
+                t_lon.setText(a_lon);
+                String tempResp = "";
+                String param = "&lat="+a_lat+"&lon="+a_lon;
+                tempResp = getWeather(param);
+                System.out.println(tempResp);//Delete later
             }
         });
     }
 
-    public void getLocation(View view) {
+    public String getLocs(int ID) { //Get Current Lat and Lon 1=lat, 2=lon
+        String asd_lat = "";
+        String asd_lon = "";
         gpsTracker = new GpsTracker(MainActivity.this);
         if (gpsTracker.canGetLocation()) {
             double latitude = gpsTracker.getLatitude();
             double longitude = gpsTracker.getLongitude();
-            t_lat.setText(String.valueOf(latitude));
-            t_lon.setText(String.valueOf(longitude));
+            asd_lat = String.valueOf(latitude);
+            asd_lon = String.valueOf(longitude);
         } else {
             gpsTracker.showSettingsAlert();
         }
+        if (ID == 1) {
+            return asd_lat;
+        } else if (ID == 2) {
+            return asd_lon;
+        } else {
+            return "0";
+        }
+    }
+
+    protected String getWeather(String param) {
+        String fulllUrl = url1 + param;
+        String response = HttpRequest.excuteGet(fulllUrl);
+        return response;
     }
 
 }
